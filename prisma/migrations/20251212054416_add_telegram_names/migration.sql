@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `telegramuser` ADD COLUMN `firstName` VARCHAR(191) NOT NULL DEFAULT '',
+    ADD COLUMN `lastName` VARCHAR(191) NOT NULL DEFAULT '';

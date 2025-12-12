@@ -1,4 +1,4 @@
-import { IsString, IsBoolean, IsOptional, IsNotEmpty, Matches, Length } from 'class-validator';
+import { IsString, IsBoolean, IsOptional, IsNotEmpty, Matches, Length, IsInt } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
@@ -54,4 +54,9 @@ export class CreateUserDto {
   })
   @IsBoolean()
   gender: boolean;
+
+  @IsOptional()
+  @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
+  @IsInt()
+  telegramUserId?: number;
 }

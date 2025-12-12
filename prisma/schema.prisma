@@ -11,21 +11,43 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  image     String?
-  sudlangan Boolean  @default(false)
-  name      String
-  surname   String
-  username  String   @unique
-  birthdate String   // Format: 08.10.2000
-  phone     String   // Format: +998901234567
-  pinfl     String   @db.VarChar(16)
-  gender    Boolean  // true for male, false for female
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int           @id @default(autoincrement())
+  image         String?
+  sudlangan     Boolean       @default(false)
+  name          String
+  surname       String
+  username      String        @unique
+  birthdate     String        // Format: 08.10.2000
+  phone         String        // Format: +998901234567
+  pinfl         String        @db.VarChar(16)
+  gender        Boolean       // true for male, false for female
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   
-  phones    Phone[]
-  cards     Card[]
+  phones        Phone[]
+  cards         Card[]
+  telegramUser  TelegramUser?
+  comments      Comment[]
+  videos        Video[]
+  images        Image[]
+  
+  // Many-to-many relation for partners/associates
+  partners      UserPartner[] @relation("UserToPartner")
+  partneredBy   UserPartner[] @relation("PartnerToUser")
+}
+
+model UserPartner {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  partnerId   Int
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation("UserToPartner", fields: [userId], references: [id], onDelete: Cascade)
+  partner     User     @relation("PartnerToUser", fields: [partnerId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, partnerId])
+  @@index([userId])
+  @@index([partnerId])
 }
 
 model Phone {
@@ -46,4 +68,58 @@ model Card {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model TelegramUser {
+  id         Int      @id @default(autoincrement())
+  telegramId BigInt   @unique
+  phone      String
+  firstName  String   @default("")
+  lastName   String   @default("")
+  fullname   String   @default("")
+  username   String   @default("")
+  userId     Int?     @unique
+  user       User?    @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+model Video {
+  id          Int      @id @default(autoincrement())
+  title       String?
+  description String?  @db.Text
+  url         String   // Video fayl yo'li yoki URL
+  duration    Int?     // Soniyalarda
+  fileSize    Int?     // Baytlarda
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  title       String?
+  description String?  @db.Text
+  url         String   // Rasm fayl yo'li yoki URL
+  fileSize    Int?     // Baytlarda
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
 }

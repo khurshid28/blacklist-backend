@@ -149,4 +149,26 @@ export class UserController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);
   }
+
+  // Sheriklar (Partners) endpoints
+  @Post(':id/partners')
+  addPartners(
+    @Param('id', ParseIntPipe) userId: number,
+    @Body('partnerIds') partnerIds: number[],
+  ) {
+    return this.userService.addPartners(userId, partnerIds);
+  }
+
+  @Get(':id/partners')
+  getPartners(@Param('id', ParseIntPipe) userId: number) {
+    return this.userService.getPartners(userId);
+  }
+
+  @Delete(':id/partners/:partnerId')
+  removePartner(
+    @Param('id', ParseIntPipe) userId: number,
+    @Param('partnerId', ParseIntPipe) partnerId: number,
+  ) {
+    return this.userService.removePartner(userId, partnerId);
+  }
 }
