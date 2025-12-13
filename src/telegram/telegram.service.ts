@@ -5,16 +5,7 @@ import { Api } from 'telegram/tl';
 import big from 'big-integer';
 import * as fs from 'fs';
 import { PrismaService } from '../prisma/prisma.service';
-
-interface TelegramUser {
-  id: number;
-  telegramId: number;
-  phone: string;
-  fullname: string;
-  username: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { TelegramUser } from './interfaces/telegram-user.interface';
 
 @Injectable()
 export class TelegramService implements OnModuleInit {

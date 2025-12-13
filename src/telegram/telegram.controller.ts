@@ -1,15 +1,6 @@
 import { Controller, Get, Post, Query, Body } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
-
-interface TelegramUser {
-  id: number;
-  telegramId: number;
-  phone: string;
-  fullname: string;
-  username: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { TelegramUser } from './interfaces/telegram-user.interface';
 
 @Controller('telegram')
 export class TelegramController {
