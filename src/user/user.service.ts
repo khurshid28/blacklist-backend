@@ -8,17 +8,37 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { telegramUserId, ...userData } = createUserDto;
+    const { telegramUserId, phones, cards, ...userData } = createUserDto;
     
-    // Create user
+    console.log('📥 Creating user with phones and cards:', { 
+      userData, 
+      phones: phones?.length || 0, 
+      cards: cards?.length || 0 
+    });
+    
+    // Create user with phones and cards in one transaction
     const user = await this.prisma.user.create({
-      data: userData,
+      data: {
+        ...userData,
+        phones: phones?.length ? {
+          create: phones.map(p => ({ phone: p.phone }))
+        } : undefined,
+        cards: cards?.length ? {
+          create: cards.map(c => ({
+            bankName: c.bankName,
+            number: c.number,
+            expired: c.expired
+          }))
+        } : undefined,
+      },
       include: {
         phones: true,
         cards: true,
         telegramUser: true,
       },
     });
+    
+    console.log(`✅ User created with ${user.phones.length} phones and ${user.cards.length} cards`);
 
     // Connect TelegramUser if provided
     if (telegramUserId) {
@@ -152,9 +172,11 @@ export class UserService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     await this.findOne(id); // Check if exists
 
+    const { phones, cards, ...userData } = updateUserDto;
+
     return this.prisma.user.update({
       where: { id },
-      data: updateUserDto,
+      data: userData,
       include: {
         phones: true,
         cards: true,

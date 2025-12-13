@@ -1,5 +1,21 @@
-import { IsString, IsBoolean, IsOptional, IsNotEmpty, Matches, Length, IsInt } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsString, IsBoolean, IsOptional, IsNotEmpty, Matches, Length, IsInt, IsArray, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+
+class PhoneDto {
+  @IsString()
+  phone: string;
+}
+
+class CardDto {
+  @IsString()
+  bankName: string;
+
+  @IsString()
+  number: string;
+
+  @IsString()
+  expired: string;
+}
 
 export class CreateUserDto {
   @IsOptional()
@@ -59,4 +75,16 @@ export class CreateUserDto {
   @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
   @IsInt()
   telegramUserId?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PhoneDto)
+  phones?: PhoneDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CardDto)
+  cards?: CardDto[];
 }

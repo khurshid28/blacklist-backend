@@ -32,6 +32,8 @@ export class UploadService {
   }
 
   getFileUrl(filename: string, folder: 'videos' | 'images'): string {
-    return `http://10.166.244.136:5555/uploads/${folder}/${filename}`;
+    // Return only the file path, not full URL
+    // Mobile will construct full URL using ApiConfig.baseUrl
+    return `/uploads/${folder}/${filename}`;
   }
 }

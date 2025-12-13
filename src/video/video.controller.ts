@@ -55,7 +55,8 @@ export class VideoController {
         throw new BadRequestException('Video fayli yuklanishi shart');
       }
 
-      const videoUrl = this.uploadService.getFileUrl(file.filename, 'videos');
+      // Save only relative path, mobile will add base URL
+      const videoUrl = `/uploads/videos/${file.filename}`;
       this.logger.log(`🔗 Video URL yaratildi: ${videoUrl}`);
       
       const result = await this.videoService.create(+userId, {

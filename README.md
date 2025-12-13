@@ -87,6 +87,18 @@ The server will start on `http://localhost:5555`
 - `PATCH /cards/:id` - Update card
 - `DELETE /cards/:id` - Delete card
 
+### Partners (Sheriklar)
+- `GET /users/:userId/partners` - Get user's partners
+- `POST /users/:userId/partners` - Add partners to user (bidirectional)
+- `DELETE /users/:userId/partners/:partnerId` - Remove partner relationship
+
+### Comments, Videos, Images
+- `GET /users/:userId/comments` - Get user's comments
+- `POST /users/:userId/comments` - Add comment to user
+- `PATCH /users/:userId/comments/:id` - Update comment
+- `DELETE /users/:userId/comments/:id` - Delete comment
+- Similar endpoints for videos and images
+
 ## Models
 
 ### User
@@ -118,6 +130,26 @@ The server will start on `http://localhost:5555`
 - `userId`: Foreign key to User
 - `createdAt`: Auto-generated
 - `updatedAt`: Auto-generated
+
+### UserPartner (Sheriklar)
+- `id`: Auto-increment ID
+- `userId`: Foreign key to User (CASCADE delete)
+- `partnerId`: Foreign key to User (CASCADE delete)
+- `createdAt`: Auto-generated
+- **Important**: When a user is deleted, all their partner relationships are automatically removed from both sides
+
+### Comment, Video, Image
+- Each has `userId` foreign key with CASCADE delete
+- When user is deleted, all their comments, videos, and images are also deleted
+
+## Cascade Delete Behavior
+
+When a user is deleted:
+- ✅ All phones associated with the user are deleted
+- ✅ All cards associated with the user are deleted
+- ✅ All partner relationships (both directions) are deleted
+- ✅ All comments, videos, and images are deleted
+- ✅ TelegramUser association is nullified
 
 ## Project Structure
 

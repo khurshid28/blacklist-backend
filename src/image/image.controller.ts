@@ -55,7 +55,8 @@ export class ImageController {
         throw new BadRequestException('Rasm fayli yuklanishi shart');
       }
 
-      const imageUrl = this.uploadService.getFileUrl(file.filename, 'images');
+      // Save only relative path, mobile will add base URL
+      const imageUrl = `/uploads/images/${file.filename}`;
       this.logger.log(`🔗 Rasm URL yaratildi: ${imageUrl}`);
       
       const result = await this.imageService.create(+userId, {
