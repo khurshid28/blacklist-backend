@@ -27,7 +27,7 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  const port = process.env.PORT || 5555;
+  const port = process.env.PORT || 7777;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
 }
