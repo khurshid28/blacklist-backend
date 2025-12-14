@@ -39,35 +39,56 @@ export class TelegramService implements OnModuleInit {
 
   private async connectToTelegram() {
     try {
+      this.logger.log('🔌 Starting Telegram connection...');
+      
       if (!fs.existsSync(this.sessionPath)) {
-        this.logger.warn('No session found. Please run telegram login manually.');
-      } else {
-        await this.client.connect();
-        this.logger.log('✅ Telegram client connected');
-        // Load dialogs to populate accessHash cache
-        await this.loadDialogsToCache();
+        this.logger.warn('⚠️  No session found. Please run telegram login manually.');
+        return;
       }
+      
+      this.logger.log('📂 Session file found, connecting...');
+      await this.client.connect();
+      this.logger.log('✅ Telegram client connected successfully');
+      
+      this.logger.log('🔍 Checking authorization...');
+      const isAuthorized = await this.client.checkAuthorization();
+      
+      if (!isAuthorized) {
+        this.logger.error('❌ Not authorized! Session might be expired. Please re-login.');
+        return;
+      }
+      
+      this.logger.log('✅ Authorization confirmed');
+      
+      // Load dialogs to populate accessHash cache
+      await this.loadDialogsToCache();
+      
     } catch (error: any) {
-      this.logger.error('Connection failed:', error);
+      this.logger.error('❌ Telegram connection failed:', error.message);
+      this.logger.error('Stack:', error.stack);
     }
   }
 
   private async loadDialogsToCache() {
     try {
-      console.log('📚 Loading dialogs to populate accessHash cache...');
+      this.logger.log('📚 Loading dialogs to populate accessHash cache...');
       const result = await this.client.getDialogs({ limit: 500 });
+      this.logger.log(`📊 Retrieved ${result.length} dialogs`);
       
+      let cachedCount = 0;
       for (const dialog of result) {
         if (dialog.entity && 'id' in dialog.entity && 'accessHash' in dialog.entity) {
           const userId = dialog.entity.id.toString();
           const accessHash = dialog.entity.accessHash?.toString() || '0';
           this.userAccessHashCache.set(userId, accessHash);
+          cachedCount++;
         }
       }
       
-      console.log(`✅ Loaded ${this.userAccessHashCache.size} users to accessHash cache`);
+      this.logger.log(`✅ Loaded ${cachedCount} users to accessHash cache`);
     } catch (error: any) {
-      this.logger.error(`Failed to load dialogs: ${error.message}`);
+      this.logger.error(`❌ Failed to load dialogs: ${error.message}`);
+      this.logger.error('Stack:', error.stack);
     }
   }
 
