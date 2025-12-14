@@ -32,9 +32,18 @@ export class TelegramService implements OnModuleInit {
 
   async onModuleInit() {
     // Connect to Telegram asynchronously without blocking server startup
-    this.connectToTelegram().catch(err => {
-      this.logger.error('Failed to connect to Telegram:', err);
-    });
+    // Set timeout to prevent hanging
+    const timeout = setTimeout(() => {
+      this.logger.warn('⚠️  Telegram connection timeout (30s). Continuing without Telegram...');
+    }, 30000);
+    
+    this.connectToTelegram()
+      .then(() => clearTimeout(timeout))
+      .catch(err => {
+        clearTimeout(timeout);
+        this.logger.error('❌ Failed to connect to Telegram:', err.message);
+        this.logger.warn('⚠️  Continuing without Telegram functionality...');
+      });
   }
 
   private async connectToTelegram() {
@@ -42,19 +51,27 @@ export class TelegramService implements OnModuleInit {
       this.logger.log('🔌 Starting Telegram connection...');
       
       if (!fs.existsSync(this.sessionPath)) {
-        this.logger.warn('⚠️  No session found. Please run telegram login manually.');
+        this.logger.warn('⚠️  No session found. Telegram features will be disabled.');
         return;
       }
       
       this.logger.log('📂 Session file found, connecting...');
-      await this.client.connect();
+      
+      // Add connection timeout
+      const connectPromise = this.client.connect();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Connection timeout')), 25000)
+      );
+      
+      await Promise.race([connectPromise, timeoutPromise]);
+      
       this.logger.log('✅ Telegram client connected successfully');
       
       this.logger.log('🔍 Checking authorization...');
       const isAuthorized = await this.client.checkAuthorization();
       
       if (!isAuthorized) {
-        this.logger.error('❌ Not authorized! Session might be expired. Please re-login.');
+        this.logger.error('❌ Not authorized! Session expired. Telegram features disabled.');
         return;
       }
       
@@ -65,7 +82,7 @@ export class TelegramService implements OnModuleInit {
       
     } catch (error: any) {
       this.logger.error('❌ Telegram connection failed:', error.message);
-      this.logger.error('Stack:', error.stack);
+      this.logger.warn('⚠️  Telegram features will be disabled');
     }
   }
 
