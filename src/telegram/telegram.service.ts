@@ -31,12 +31,19 @@ export class TelegramService implements OnModuleInit {
   }
 
   async onModuleInit() {
+    // Connect to Telegram asynchronously without blocking server startup
+    this.connectToTelegram().catch(err => {
+      this.logger.error('Failed to connect to Telegram:', err);
+    });
+  }
+
+  private async connectToTelegram() {
     try {
       if (!fs.existsSync(this.sessionPath)) {
         this.logger.warn('No session found. Please run telegram login manually.');
       } else {
         await this.client.connect();
-        this.logger.log('Telegram client connected');
+        this.logger.log('✅ Telegram client connected');
         // Load dialogs to populate accessHash cache
         await this.loadDialogsToCache();
       }
