@@ -46,7 +46,18 @@ export class TelegramService implements OnModuleInit {
       timeout: 60000,
       requestRetries: 5,
       autoReconnect: true,
-      baseLogger: undefined,
+      retryDelay: 5000,
+      maxConcurrentDownloads: 1,
+      baseLogger: {
+        log: () => {},
+        info: () => {},
+        warn: () => {},
+        error: (msg: string) => {
+          if (!msg.includes('TIMEOUT') && !msg.includes('reconnect')) {
+            this.logger.error(`Telegram: ${msg}`);
+          }
+        },
+      },
       ...(proxyConfig && { proxy: proxyConfig }),
     });
   }
