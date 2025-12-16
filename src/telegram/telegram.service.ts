@@ -25,6 +25,15 @@ export class TelegramService implements OnModuleInit {
       session = new StringSession('');
     }
     
+    // SOCKS proxy settings (if available)
+    const proxySettings = process.env.TELEGRAM_PROXY_HOST ? {
+      socksType: 5 as 5,
+      ip: process.env.TELEGRAM_PROXY_HOST,
+      port: parseInt(process.env.TELEGRAM_PROXY_PORT || '1080'),
+      username: process.env.TELEGRAM_PROXY_USER,
+      password: process.env.TELEGRAM_PROXY_PASS,
+    } : undefined;
+    
     // Extended connection settings for better reliability
     this.client = new TelegramClient(session, apiId, apiHash, {
       connectionRetries: 10,
@@ -33,6 +42,7 @@ export class TelegramService implements OnModuleInit {
       requestRetries: 5,
       autoReconnect: true,
       baseLogger: undefined, // Reduce logging noise
+      proxy: proxySettings,
     });
   }
 
