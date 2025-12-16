@@ -30,28 +30,27 @@ export class TelegramService implements OnModuleInit {
     });
   }
 
-  async onModuleInit() {
-    // Connect to Telegram asynchronously without blocking server startup
-    // Set timeout to prevent hanging
-    const timeout = setTimeout(() => {
-      this.logger.warn('⚠️  Telegram connection timeout (30s). Continuing without Telegram...');
-    }, 30000);
+  onModuleInit() {
+    // Connect to Telegram asynchronously - COMPLETELY non-blocking
+    this.logger.log('🚀 Server starting... Telegram will connect in background');
     
-    this.connectToTelegram()
-      .then(() => clearTimeout(timeout))
-      .catch(err => {
-        clearTimeout(timeout);
-        this.logger.error('❌ Failed to connect to Telegram:', err.message);
-        this.logger.warn('⚠️  Continuing without Telegram functionality...');
+    // Fire and forget - do NOT await, do NOT block
+    setImmediate(() => {
+      this.connectToTelegram().catch(err => {
+        this.logger.error('❌ Telegram connection error:', err.message);
+        this.logger.error('Stack:', err.stack);
       });
+    });
   }
 
   private async connectToTelegram() {
     try {
       this.logger.log('🔌 Starting Telegram connection...');
+      this.logger.log(`Session path: ${this.sessionPath}`);
       
       if (!fs.existsSync(this.sessionPath)) {
         this.logger.warn('⚠️  No session found. Telegram features will be disabled.');
+        this.logger.warn('Please login first using telegram-login.js');
         return;
       }
       
@@ -60,7 +59,7 @@ export class TelegramService implements OnModuleInit {
       // Add connection timeout
       const connectPromise = this.client.connect();
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), 25000)
+        setTimeout(() => reject(new Error('Connection timeout after 25s')), 25000)
       );
       
       await Promise.race([connectPromise, timeoutPromise]);
@@ -72,40 +71,19 @@ export class TelegramService implements OnModuleInit {
       
       if (!isAuthorized) {
         this.logger.error('❌ Not authorized! Session expired. Telegram features disabled.');
+        this.logger.warn('Please re-login using telegram-login.js');
         return;
       }
       
       this.logger.log('✅ Authorization confirmed');
+      this.logger.log('🎉 Telegram is ready and working!');
       
-      // Load dialogs to populate accessHash cache
-      await this.loadDialogsToCache();
+      // Cache will be populated on-demand when searching users
       
     } catch (error: any) {
       this.logger.error('❌ Telegram connection failed:', error.message);
+      this.logger.error('Error stack:', error.stack);
       this.logger.warn('⚠️  Telegram features will be disabled');
-    }
-  }
-
-  private async loadDialogsToCache() {
-    try {
-      this.logger.log('📚 Loading dialogs to populate accessHash cache...');
-      const result = await this.client.getDialogs({ limit: 500 });
-      this.logger.log(`📊 Retrieved ${result.length} dialogs`);
-      
-      let cachedCount = 0;
-      for (const dialog of result) {
-        if (dialog.entity && 'id' in dialog.entity && 'accessHash' in dialog.entity) {
-          const userId = dialog.entity.id.toString();
-          const accessHash = dialog.entity.accessHash?.toString() || '0';
-          this.userAccessHashCache.set(userId, accessHash);
-          cachedCount++;
-        }
-      }
-      
-      this.logger.log(`✅ Loaded ${cachedCount} users to accessHash cache`);
-    } catch (error: any) {
-      this.logger.error(`❌ Failed to load dialogs: ${error.message}`);
-      this.logger.error('Stack:', error.stack);
     }
   }
 
