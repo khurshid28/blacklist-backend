@@ -29,14 +29,24 @@ export class TelegramService implements OnModuleInit {
         return;
       }
       
-      let session;
-      if (fs.existsSync(this.sessionPath)) {
-        session = new StringSession(fs.readFileSync(this.sessionPath, 'utf8'));
-      } else {
+      // Check if session file exists - required for connection
+      if (!fs.existsSync(this.sessionPath)) {
         this.logger.warn('⚠️  No telegram.session file found');
-        this.logger.warn('⚠️  Telegram features will be disabled until login');
-        session = new StringSession('');
+        this.logger.warn('⚠️  Telegram features will be disabled');
+        this.logger.warn('💡 Run telegram-login.js to create session');
+        this.client = null as any;
+        return;
       }
+
+      const sessionContent = fs.readFileSync(this.sessionPath, 'utf8').trim();
+      if (!sessionContent) {
+        this.logger.warn('⚠️  telegram.session file is empty');
+        this.logger.warn('⚠️  Telegram features will be disabled');
+        this.client = null as any;
+        return;
+      }
+
+      const session = new StringSession(sessionContent);
       
       // Proxy settings (for servers behind NAT/firewall)
       const useProxy = process.env.TELEGRAM_USE_PROXY === 'true';
@@ -63,6 +73,8 @@ export class TelegramService implements OnModuleInit {
         maxConcurrentDownloads: 1,
         ...(proxyConfig && { proxy: proxyConfig }),
       });
+      
+      this.logger.log('✅ Telegram client initialized');
     } catch (error: any) {
       this.logger.error('❌ Failed to initialize Telegram client:', error.message);
       this.logger.warn('⚠️  Telegram features will be disabled');
