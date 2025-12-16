@@ -7,6 +7,25 @@ const path_1 = require("path");
 BigInt.prototype.toJSON = function () {
     return this.toString();
 };
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('🔴 Unhandled Rejection at:', promise);
+    console.error('🔴 Reason:', reason);
+    if (reason?.message?.includes('PANIC') || reason?.code === 'GenericFailure') {
+        console.error('⚠️  Telegram library panic detected - ignoring to keep server alive');
+        console.error('⚠️  Telegram features may be unavailable');
+        return;
+    }
+    console.error('⚠️  Error will be logged but server continues');
+});
+process.on('uncaughtException', (error) => {
+    console.error('🔴 Uncaught Exception:', error);
+    if (error?.message?.includes('PANIC') || error?.code === 'GenericFailure') {
+        console.error('⚠️  Telegram library panic detected - ignoring to keep server alive');
+        console.error('⚠️  Telegram features may be unavailable');
+        return;
+    }
+    console.error('⚠️  Critical error - server may need restart');
+});
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors();

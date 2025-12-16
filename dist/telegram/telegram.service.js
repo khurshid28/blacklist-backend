@@ -65,11 +65,19 @@ let TelegramService = TelegramService_1 = class TelegramService {
         try {
             const apiId = parseInt(process.env.TELEGRAM_API_ID || '0');
             const apiHash = process.env.TELEGRAM_API_HASH || '';
+            if (!apiId || !apiHash || apiId === 0) {
+                this.logger.warn('⚠️  TELEGRAM_API_ID or TELEGRAM_API_HASH not configured');
+                this.logger.warn('⚠️  Telegram features will be disabled');
+                this.client = null;
+                return;
+            }
             let session;
             if (fs.existsSync(this.sessionPath)) {
                 session = new sessions_1.StringSession(fs.readFileSync(this.sessionPath, 'utf8'));
             }
             else {
+                this.logger.warn('⚠️  No telegram.session file found');
+                this.logger.warn('⚠️  Telegram features will be disabled until login');
                 session = new sessions_1.StringSession('');
             }
             const useProxy = process.env.TELEGRAM_USE_PROXY === 'true';

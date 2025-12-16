@@ -21,10 +21,20 @@ export class TelegramService implements OnModuleInit {
       const apiId = parseInt(process.env.TELEGRAM_API_ID || '0');
       const apiHash = process.env.TELEGRAM_API_HASH || '';
       
+      // If no API credentials, skip initialization
+      if (!apiId || !apiHash || apiId === 0) {
+        this.logger.warn('⚠️  TELEGRAM_API_ID or TELEGRAM_API_HASH not configured');
+        this.logger.warn('⚠️  Telegram features will be disabled');
+        this.client = null as any;
+        return;
+      }
+      
       let session;
       if (fs.existsSync(this.sessionPath)) {
         session = new StringSession(fs.readFileSync(this.sessionPath, 'utf8'));
       } else {
+        this.logger.warn('⚠️  No telegram.session file found');
+        this.logger.warn('⚠️  Telegram features will be disabled until login');
         session = new StringSession('');
       }
       

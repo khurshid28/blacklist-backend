@@ -9,6 +9,38 @@ import { join } from 'path';
   return this.toString();
 };
 
+// Global error handlers to prevent Telegram panics from crashing the app
+process.on('unhandledRejection', (reason: any, promise) => {
+  console.error('🔴 Unhandled Rejection at:', promise);
+  console.error('🔴 Reason:', reason);
+  
+  // Check if it's a Telegram panic
+  if (reason?.message?.includes('PANIC') || reason?.code === 'GenericFailure') {
+    console.error('⚠️  Telegram library panic detected - ignoring to keep server alive');
+    console.error('⚠️  Telegram features may be unavailable');
+    // Don't crash the app
+    return;
+  }
+  
+  // For other errors, log but don't crash
+  console.error('⚠️  Error will be logged but server continues');
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('🔴 Uncaught Exception:', error);
+  
+  // Check if it's a Telegram panic
+  if (error?.message?.includes('PANIC') || (error as any)?.code === 'GenericFailure') {
+    console.error('⚠️  Telegram library panic detected - ignoring to keep server alive');
+    console.error('⚠️  Telegram features may be unavailable');
+    // Don't crash the app
+    return;
+  }
+  
+  // For other critical errors, we might need to exit
+  console.error('⚠️  Critical error - server may need restart');
+});
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
