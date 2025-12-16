@@ -62,43 +62,58 @@ let TelegramService = TelegramService_1 = class TelegramService {
         this.userAccessHashCache = new Map();
         this.isConnected = false;
         this.isConnecting = false;
-        const apiId = parseInt(process.env.TELEGRAM_API_ID || '0');
-        const apiHash = process.env.TELEGRAM_API_HASH || '';
-        let session;
-        if (fs.existsSync(this.sessionPath)) {
-            session = new sessions_1.StringSession(fs.readFileSync(this.sessionPath, 'utf8'));
+        try {
+            const apiId = parseInt(process.env.TELEGRAM_API_ID || '0');
+            const apiHash = process.env.TELEGRAM_API_HASH || '';
+            let session;
+            if (fs.existsSync(this.sessionPath)) {
+                session = new sessions_1.StringSession(fs.readFileSync(this.sessionPath, 'utf8'));
+            }
+            else {
+                session = new sessions_1.StringSession('');
+            }
+            const useProxy = process.env.TELEGRAM_USE_PROXY === 'true';
+            const proxyConfig = useProxy ? {
+                socksType: 5,
+                ip: process.env.TELEGRAM_PROXY_HOST || '127.0.0.1',
+                port: parseInt(process.env.TELEGRAM_PROXY_PORT || '1080'),
+                ...(process.env.TELEGRAM_PROXY_USER && {
+                    username: process.env.TELEGRAM_PROXY_USER,
+                    password: process.env.TELEGRAM_PROXY_PASS || '',
+                }),
+            } : undefined;
+            this.logger.log(useProxy ? `🔒 Using SOCKS5 proxy: ${proxyConfig?.ip}:${proxyConfig?.port}` : '🌐 Direct connection');
+            this.client = new telegram_1.TelegramClient(session, apiId, apiHash, {
+                connectionRetries: 5,
+                useWSS: false,
+                timeout: 30000,
+                requestRetries: 3,
+                autoReconnect: false,
+                retryDelay: 3000,
+                maxConcurrentDownloads: 1,
+                ...(proxyConfig && { proxy: proxyConfig }),
+            });
         }
-        else {
-            session = new sessions_1.StringSession('');
+        catch (error) {
+            this.logger.error('❌ Failed to initialize Telegram client:', error.message);
+            this.logger.warn('⚠️  Telegram features will be disabled');
+            this.client = null;
         }
-        const useProxy = process.env.TELEGRAM_USE_PROXY === 'true';
-        const proxyConfig = useProxy ? {
-            socksType: 5,
-            ip: process.env.TELEGRAM_PROXY_HOST || '127.0.0.1',
-            port: parseInt(process.env.TELEGRAM_PROXY_PORT || '1080'),
-            ...(process.env.TELEGRAM_PROXY_USER && {
-                username: process.env.TELEGRAM_PROXY_USER,
-                password: process.env.TELEGRAM_PROXY_PASS || '',
-            }),
-        } : undefined;
-        this.logger.log(useProxy ? `🔒 Using SOCKS5 proxy: ${proxyConfig?.ip}:${proxyConfig?.port}` : '🌐 Direct connection');
-        this.client = new telegram_1.TelegramClient(session, apiId, apiHash, {
-            connectionRetries: 5,
-            useWSS: false,
-            timeout: 30000,
-            requestRetries: 3,
-            autoReconnect: false,
-            retryDelay: 3000,
-            maxConcurrentDownloads: 1,
-            ...(proxyConfig && { proxy: proxyConfig }),
-        });
     }
     async onModuleInit() {
+        if (!this.client) {
+            this.logger.warn('⚠️  Telegram client not initialized, skipping connection');
+            return;
+        }
         this.connectToTelegram().catch(err => {
             this.logger.error('❌ Initial Telegram connection failed:', err.message);
+            this.logger.warn('⚠️  Server will continue without Telegram');
         });
     }
     async connectToTelegram() {
+        if (!this.client) {
+            return;
+        }
         if (this.isConnecting) {
             this.logger.log('⏳ Connection already in progress...');
             return;
@@ -149,6 +164,10 @@ let TelegramService = TelegramService_1 = class TelegramService {
         }
     }
     async ensureConnected() {
+        if (!this.client) {
+            this.logger.warn('⚠️  Telegram client not available');
+            return false;
+        }
         if (this.isConnected) {
             return true;
         }
