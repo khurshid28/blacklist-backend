@@ -48,16 +48,6 @@ export class TelegramService implements OnModuleInit {
       autoReconnect: true,
       retryDelay: 5000,
       maxConcurrentDownloads: 1,
-      ...(proxyConfig && { proxy: proxyConfig }),
-    });
-  }
-
-  onModuleInit() {
-    // Connect to Telegram asynchronously - COMPLETELY non-blocking
-    this.logger.log('🚀 Server starting... Telegram will connect in background');
-    
-    // Fire and forget - do NOT await, do NOT block
-    setImmediate(() => {
       this.connectToTelegram().catch(err => {
         this.logger.error('❌ Telegram connection error:', err.message);
         this.logger.error('Stack:', err.stack);
