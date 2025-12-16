@@ -13,6 +13,8 @@ export class TelegramService implements OnModuleInit {
   private client: TelegramClient;
   private sessionPath = './telegram.session';
   private userAccessHashCache = new Map<string, string>(); // telegramId -> accessHash
+  private isConnected = false;
+  private isConnecting = false;
 
   constructor(private prisma: PrismaService) {
     const apiId = parseInt(process.env.TELEGRAM_API_ID || '0');
@@ -41,21 +43,36 @@ export class TelegramService implements OnModuleInit {
     
     // Extended connection settings for better reliability
     this.client = new TelegramClient(session, apiId, apiHash, {
-      connectionRetries: 10,
+      connectionRetries: 5,
       useWSS: false,
-      timeout: 60000,
-      requestRetries: 5,
-      autoReconnect: true,
-      retryDelay: 5000,
+      timeout: 30000,
+      requestRetries: 3,
+      autoReconnect: false, // Manual reconnect control
+      retryDelay: 3000,
       maxConcurrentDownloads: 1,
-      this.connectToTelegram().catch(err => {
-        this.logger.error('❌ Telegram connection error:', err.message);
-        this.logger.error('Stack:', err.stack);
-      });
+      ...(proxyConfig && { proxy: proxyConfig }),
+    });
+  }
+
+  async onModuleInit() {
+    // Don't block server startup - connect in background
+    this.connectToTelegram().catch(err => {
+      this.logger.error('❌ Initial Telegram connection failed:', err.message);
     });
   }
 
   private async connectToTelegram() {
+    if (this.isConnecting) {
+      this.logger.log('⏳ Connection already in progress...');
+      return;
+    }
+
+    if (this.isConnected) {
+      this.logger.log('✅ Already connected');
+      return;
+    }
+
+    this.isConnecting = true;
     try {
       this.logger.log('🔌 Starting Telegram connection...');
       this.logger.log(`Session path: ${this.sessionPath}`);
@@ -68,11 +85,11 @@ export class TelegramService implements OnModuleInit {
       
       this.logger.log('📂 Session file found, connecting...');
       
-      // Add connection timeout - 60 seconds for very slow networks
-      this.logger.log('⏱️  Attempting connection with 60s timeout...');
+      // Reduced timeout for faster failure detection
+      this.logger.log('⏱️  Attempting connection with 30s timeout...');
       const connectPromise = this.client.connect();
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout after 60s')), 60000)
+        setTimeout(() => reject(new Error('Connection timeout after 30s')), 30000)
       );
       
       await Promise.race([connectPromise, timeoutPromise]);
@@ -85,19 +102,40 @@ export class TelegramService implements OnModuleInit {
       if (!isAuthorized) {
         this.logger.error('❌ Not authorized! Session expired. Telegram features disabled.');
         this.logger.warn('Please re-login using telegram-login.js');
+        this.isConnecting = false;
         return;
       }
       
       this.logger.log('✅ Authorization confirmed');
       this.logger.log('🎉 Telegram is ready and working!');
+      this.isConnected = true;
       
       // Cache will be populated on-demand when searching users
       
     } catch (error: any) {
       this.logger.error('❌ Telegram connection failed:', error.message);
-      this.logger.error('Error stack:', error.stack);
       this.logger.warn('⚠️  Telegram features will be disabled');
+      this.isConnected = false;
+      
+      // Try to disconnect cleanly
+      try {
+        await this.client.disconnect();
+      } catch (disconnectError) {
+        // Ignore disconnect errors
+      }
+    } finally {
+      this.isConnecting = false;
     }
+  }
+
+  private async ensureConnected(): Promise<boolean> {
+    if (this.isConnected) {
+      return true;
+    }
+
+    this.logger.warn('⚠️  Not connected to Telegram, attempting reconnect...');
+    await this.connectToTelegram();
+    return this.isConnected;
   }
 
   private formatPhone(phone: string): string {
@@ -269,6 +307,11 @@ export class TelegramService implements OnModuleInit {
 
   private async findByPhone(phone: string): Promise<any> {
     try {
+      if (!await this.ensureConnected()) {
+        this.logger.warn('Cannot search by phone: not connected to Telegram');
+        return null;
+      }
+
       const formattedPhone = this.formatPhone(phone);
       console.log('findByPhone - Formatted:', formattedPhone);
       
@@ -315,6 +358,11 @@ export class TelegramService implements OnModuleInit {
 
   private async findByUsername(username: string): Promise<any> {
     try {
+      if (!await this.ensureConnected()) {
+        this.logger.warn('Cannot search by username: not connected to Telegram');
+        return null;
+      }
+
       const cleanUsername = username.replace('@', '');
       
       const result = await this.client.invoke(
@@ -348,6 +396,11 @@ export class TelegramService implements OnModuleInit {
 
   private async findById(telegramId: string): Promise<any> {
     try {
+      if (!await this.ensureConnected()) {
+        this.logger.warn('Cannot search by ID: not connected to Telegram');
+        return null;
+      }
+
       // Check if we have accessHash in cache
       const accessHash = this.userAccessHashCache.get(telegramId) || '0';
       console.log(`🔑 Using accessHash for ${telegramId}: ${accessHash !== '0' ? 'FOUND' : 'NOT FOUND (trying anyway)'}`);
