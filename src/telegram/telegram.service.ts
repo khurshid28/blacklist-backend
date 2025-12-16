@@ -25,8 +25,14 @@ export class TelegramService implements OnModuleInit {
       session = new StringSession('');
     }
     
+    // Extended connection settings for better reliability
     this.client = new TelegramClient(session, apiId, apiHash, {
-      connectionRetries: 5,
+      connectionRetries: 10,
+      useWSS: false,
+      timeout: 60000, // 60 seconds
+      requestRetries: 5,
+      autoReconnect: true,
+      baseLogger: undefined, // Reduce logging noise
     });
   }
 
