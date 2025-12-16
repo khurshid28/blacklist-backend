@@ -56,11 +56,11 @@ export class TelegramService implements OnModuleInit {
       
       this.logger.log('📂 Session file found, connecting...');
       
-      // Add connection timeout - 30 seconds for slow networks
-      this.logger.log('⏱️  Attempting connection with 30s timeout...');
+      // Add connection timeout - 60 seconds for very slow networks
+      this.logger.log('⏱️  Attempting connection with 60s timeout...');
       const connectPromise = this.client.connect();
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout after 30s')), 30000)
+        setTimeout(() => reject(new Error('Connection timeout after 60s')), 60000)
       );
       
       await Promise.race([connectPromise, timeoutPromise]);
