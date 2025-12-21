@@ -7,10 +7,10 @@ export declare class VideoController {
     private readonly logger;
     constructor(videoService: VideoService, uploadService: UploadService);
     create(userId: string, file: Express.Multer.File, createVideoDto: CreateVideoDto): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
@@ -18,10 +18,10 @@ export declare class VideoController {
         fileSize: number | null;
     }>;
     findAll(userId: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
@@ -29,10 +29,10 @@ export declare class VideoController {
         fileSize: number | null;
     }[]>;
     findOne(id: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
@@ -40,10 +40,10 @@ export declare class VideoController {
         fileSize: number | null;
     }>;
     update(id: string, updateData: Partial<CreateVideoDto>): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
@@ -51,10 +51,10 @@ export declare class VideoController {
         fileSize: number | null;
     }>;
     remove(id: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;

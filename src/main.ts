@@ -42,10 +42,72 @@ process.on('uncaughtException', (error) => {
 });
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: ['error', 'warn', 'debug', 'log', 'verbose'],
+  });
   
   // Enable CORS
   app.enableCors();
+  
+  // Request/Response Logger Middleware
+  app.use((req, res, next) => {
+    const { method, originalUrl, body, query, params } = req;
+    const startTime = Date.now();
+    
+    // Log request
+    console.log('\n📥 ===== INCOMING REQUEST =====');
+    console.log(`🔹 Method: ${method}`);
+    console.log(`🔹 URL: ${originalUrl}`);
+    console.log(`🔹 Time: ${new Date().toISOString()}`);
+    if (Object.keys(query).length > 0) {
+      console.log(`🔹 Query:`, JSON.stringify(query, null, 2));
+    }
+    if (Object.keys(params).length > 0) {
+      console.log(`🔹 Params:`, JSON.stringify(params, null, 2));
+    }
+    if (body && Object.keys(body).length > 0) {
+      // Don't log passwords
+      const safeBody = { ...body };
+      if (safeBody.password) safeBody.password = '***';
+      console.log(`🔹 Body:`, JSON.stringify(safeBody, null, 2));
+    }
+    console.log('==============================\n');
+
+    // Capture response
+    const originalSend = res.send;
+    res.send = function (data) {
+      const duration = Date.now() - startTime;
+      
+      console.log('\n📤 ===== OUTGOING RESPONSE =====');
+      console.log(`🔸 Method: ${method}`);
+      console.log(`🔸 URL: ${originalUrl}`);
+      console.log(`🔸 Status: ${res.statusCode}`);
+      console.log(`🔸 Duration: ${duration}ms`);
+      
+      // Try to parse and log response data
+      try {
+        const responseData = typeof data === 'string' ? JSON.parse(data) : data;
+        if (responseData) {
+          // Limit response logging size
+          const dataStr = JSON.stringify(responseData, null, 2);
+          if (dataStr.length > 500) {
+            console.log(`🔸 Response: ${dataStr.substring(0, 500)}... (truncated)`);
+          } else {
+            console.log(`🔸 Response:`, dataStr);
+          }
+        }
+      } catch (e) {
+        // If not JSON, just log type
+        console.log(`🔸 Response Type: ${typeof data}`);
+      }
+      
+      console.log('===============================\n');
+      
+      return originalSend.call(this, data);
+    };
+    
+    next();
+  });
   
   // Enable validation
   app.useGlobalPipes(new ValidationPipe({

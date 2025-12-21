@@ -4,38 +4,38 @@ export declare class CommentService {
     private prisma;
     constructor(prisma: PrismaService);
     create(userId: number, createCommentDto: CreateCommentDto): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
     findAll(userId: number): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }[]>;
     findOne(id: number): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
     update(id: number, content: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
     remove(id: number): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
 }

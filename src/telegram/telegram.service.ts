@@ -349,7 +349,7 @@ export class TelegramService implements OnModuleInit {
     }
   }
 
-  private async findByPhone(phone: string): Promise<any> {
+  async findByPhone(phone: string): Promise<any> {
     try {
       if (!await this.ensureConnected()) {
         this.logger.warn('Cannot search by phone: not connected to Telegram');
@@ -365,17 +365,19 @@ export class TelegramService implements OnModuleInit {
             new Api.InputPhoneContact({
               clientId: big(Date.now()),
               phone: formattedPhone,
-              firstName: 'Search',
-              lastName: 'User',
+              firstName: 'Search',  // This is just for import, not saved
+              lastName: 'User',     // This is just for import, not saved
             }),
           ],
         }),
       );
 
       console.log('findByPhone - API result:', result);
+      console.log('findByPhone - Imported contacts:', result.imported);
+      
       if (result.users && result.users.length > 0) {
         const user = result.users[0] as any;
-        console.log('findByPhone - User found:', user);
+        console.log('findByPhone - Full user object:', JSON.stringify(user, null, 2));
         
         // Cache the accessHash
         if (user.accessHash) {
@@ -383,11 +385,25 @@ export class TelegramService implements OnModuleInit {
           console.log(`✅ Cached accessHash for user ${user.id}`);
         }
         
+        // Get the real first and last name from the user object
+        let firstName = user.firstName || '';
+        let lastName = user.lastName || '';
+        
+        // If API returned our dummy names, replace with empty strings
+        if (firstName === 'Search' && lastName === 'User') {
+          console.log('⚠️  API returned dummy names - user has privacy settings, saving anyway');
+          firstName = '';
+          lastName = '';
+        }
+        
+        // Save the user even if names are empty - we still have telegram_id and phone
+        console.log(`📝 Extracted names - First: "${firstName}", Last: "${lastName}", Username: "${user.username || 'none'}"`);
+        
         return {
           telegram_id: user.id.toString(),
           username: user.username || '',
-          firstName: user.firstName || '',
-          lastName: user.lastName || '',
+          firstName: firstName,
+          lastName: lastName,
           phone: formattedPhone,
         };
       }
@@ -484,7 +500,8 @@ export class TelegramService implements OnModuleInit {
     }
   }
 
-  private async saveOrUpdateUser(userData: any): Promise<TelegramUser> {
+  async saveOrUpdateUser(userData: any): Promise<TelegramUser> {
+    // fullname should be firstName + lastName from telegram data
     const fullname = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
     const telegramId = BigInt(userData.telegram_id);
     
@@ -508,7 +525,7 @@ export class TelegramService implements OnModuleInit {
         phone: userData.phone,
         firstName: userData.firstName || '',
         lastName: userData.lastName || '',
-        fullname,
+        fullname, // This should be telegram user's first + last name
         username: userData.username,
         userId: connectedUserId, // Connect if found
       },
@@ -517,7 +534,7 @@ export class TelegramService implements OnModuleInit {
         phone: userData.phone,
         firstName: userData.firstName || '',
         lastName: userData.lastName || '',
-        fullname,
+        fullname, // This should be telegram user's first + last name
         username: userData.username,
         userId: connectedUserId, // Connect if found
       },
@@ -527,6 +544,8 @@ export class TelegramService implements OnModuleInit {
       id: saved.id,
       telegramId: Number(saved.telegramId),
       phone: saved.phone,
+      firstName: saved.firstName,
+      lastName: saved.lastName,
       fullname: saved.fullname,
       username: saved.username,
       createdAt: saved.createdAt.toISOString(),
@@ -637,7 +656,7 @@ export class TelegramService implements OnModuleInit {
     }
   }
 
-  private async searchUsers(query: string): Promise<any[]> {
+  async searchUsers(query: string): Promise<any[]> {
     console.log('Searching Users in database for:', query);
     
     try {
@@ -655,6 +674,30 @@ export class TelegramService implements OnModuleInit {
           telegramUser: true,
           phones: true,
           cards: true,
+          partners: {
+            include: {
+              partner: {
+                include: {
+                  telegramUser: true,
+                },
+              },
+            },
+          },
+          comments: {
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
+          videos: {
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
+          images: {
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
         },
         take: 20,
       });
@@ -711,6 +754,53 @@ export class TelegramService implements OnModuleInit {
       };
     } catch (error: any) {
       this.logger.error(`Connect error: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async getAllTelegramUsers(): Promise<TelegramUser[]> {
+    try {
+      const users = await this.prisma.telegramUser.findMany({
+        include: {
+          user: {
+            include: {
+              phones: true,
+              cards: true,
+              comments: {
+                orderBy: {
+                  createdAt: 'desc',
+                },
+              },
+              videos: {
+                orderBy: {
+                  createdAt: 'desc',
+                },
+              },
+              images: {
+                orderBy: {
+                  createdAt: 'desc',
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      return users.map(user => ({
+        id: user.id,
+        telegramId: Number(user.telegramId),
+        phone: user.phone,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        fullname: user.fullname,
+        username: user.username,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+        user: user.user,
+      }));
+    } catch (error: any) {
+      this.logger.error(`Get all telegram users error: ${error.message}`);
       throw error;
     }
   }

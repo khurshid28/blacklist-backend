@@ -7,50 +7,50 @@ export declare class ImageController {
     private readonly logger;
     constructor(imageService: ImageService, uploadService: UploadService);
     create(userId: string, file: Express.Multer.File, createImageDto: CreateImageDto): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
         fileSize: number | null;
     }>;
     findAll(userId: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
         fileSize: number | null;
     }[]>;
     findOne(id: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
         fileSize: number | null;
     }>;
     update(id: string, updateData: Partial<CreateImageDto>): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;
         fileSize: number | null;
     }>;
     remove(id: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         title: string | null;
         description: string | null;
         url: string;

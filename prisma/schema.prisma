@@ -71,17 +71,18 @@ model Card {
 }
 
 model TelegramUser {
-  id         Int      @id @default(autoincrement())
-  telegramId BigInt   @unique
-  phone      String
-  firstName  String   @default("")
-  lastName   String   @default("")
-  fullname   String   @default("")
-  username   String   @default("")
-  userId     Int?     @unique
-  user       User?    @relation(fields: [userId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          Int          @id @default(autoincrement())
+  telegramId  BigInt       @unique
+  phone       String
+  firstName   String       @default("")
+  lastName    String       @default("")
+  fullname    String       @default("")
+  username    String       @default("")
+  userId      Int?         @unique
+  user        User?        @relation(fields: [userId], references: [id])
+  actionItems ActionItem[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Comment {
@@ -122,4 +123,68 @@ model Image {
   updatedAt   DateTime @updatedAt
   
   @@index([userId])
+}
+
+model Client {
+  id          Int         @id @default(autoincrement())
+  fullname    String
+  phone       String      @unique // Format: +998901234567
+  password    String      // 6 raqamli parol (hashed)
+  image       String?
+  workStatus  WorkStatus  @default(ACTIVE)
+  role        ClientRole  @default(CLIENT)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  actions     Action[]
+  
+  @@index([phone])
+}
+
+model Action {
+  id              Int           @id @default(autoincrement())
+  clientId        Int
+  client          Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  status          ActionStatus  @default(PENDING)
+  startPhone      String        @default("+998900000000") // Boshlanish telefon raqami
+  maxCount        Int           @default(10) // Maksimal 10 yoki 0 (SUPER uchun)
+  processedCount  Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  completedAt     DateTime?
+  
+  items           ActionItem[]
+  
+  @@index([clientId])
+  @@index([status])
+}
+
+model ActionItem {
+  id              Int           @id @default(autoincrement())
+  actionId        Int
+  action          Action        @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  telegramUserId  Int?
+  telegramUser    TelegramUser? @relation(fields: [telegramUserId], references: [id])
+  phone           String
+  createdAt       DateTime      @default(now())
+  
+  @@index([actionId])
+  @@index([telegramUserId])
+}
+
+enum WorkStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum ClientRole {
+  SUPER
+  CLIENT
+}
+
+enum ActionStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
 }

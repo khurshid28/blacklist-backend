@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `action` ADD COLUMN `startPhone` VARCHAR(191) NOT NULL DEFAULT '+998900000000';

@@ -6,131 +6,131 @@ export declare class UserController {
     constructor(userService: UserService);
     create(createUserDto: CreateUserDto, file?: Express.Multer.File): Promise<{
         telegramUser: {
-            phone: string;
-            username: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
-            userId: number | null;
             telegramId: bigint;
+            userId: number | null;
+            phone: string;
             firstName: string;
             lastName: string;
             fullname: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
         };
         phones: {
+            id: number;
+            userId: number;
             phone: string;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
-            userId: number;
         }[];
         cards: {
             number: string;
-            bankName: string;
-            expired: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
+            bankName: string;
+            expired: string;
         }[];
     } & {
+        id: number;
         phone: string;
+        username: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
         image: string | null;
         sudlangan: boolean;
-        name: string;
         surname: string;
-        username: string;
         birthdate: string;
         pinfl: string;
         gender: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
     }>;
     search(query: string): Promise<({
         telegramUser: {
-            phone: string;
-            username: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
-            userId: number | null;
             telegramId: bigint;
+            userId: number | null;
+            phone: string;
             firstName: string;
             lastName: string;
             fullname: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
         };
         phones: {
+            id: number;
+            userId: number;
             phone: string;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
-            userId: number;
         }[];
         cards: {
             number: string;
-            bankName: string;
-            expired: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
+            bankName: string;
+            expired: string;
         }[];
     } & {
+        id: number;
         phone: string;
+        username: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
         image: string | null;
         sudlangan: boolean;
-        name: string;
         surname: string;
-        username: string;
         birthdate: string;
         pinfl: string;
         gender: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
     })[]>;
     findAll(): Promise<({
         telegramUser: {
-            phone: string;
-            username: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
-            userId: number | null;
             telegramId: bigint;
+            userId: number | null;
+            phone: string;
             firstName: string;
             lastName: string;
             fullname: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
         };
         phones: {
+            id: number;
+            userId: number;
             phone: string;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
-            userId: number;
         }[];
         cards: {
             number: string;
+            id: number;
+            userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             bankName: string;
             expired: string;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
-            userId: number;
         }[];
         comments: {
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             content: string;
         }[];
         videos: {
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             title: string | null;
             description: string | null;
             url: string;
@@ -138,76 +138,76 @@ export declare class UserController {
             fileSize: number | null;
         }[];
         images: {
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             title: string | null;
             description: string | null;
             url: string;
             fileSize: number | null;
         }[];
         partners: {
-            createdAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
             partnerId: number;
         }[];
     } & {
+        id: number;
         phone: string;
+        username: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
         image: string | null;
         sudlangan: boolean;
-        name: string;
         surname: string;
-        username: string;
         birthdate: string;
         pinfl: string;
         gender: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
     })[]>;
     findOne(id: number): Promise<{
         telegramUser: {
-            phone: string;
-            username: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
-            userId: number | null;
             telegramId: bigint;
+            userId: number | null;
+            phone: string;
             firstName: string;
             lastName: string;
             fullname: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
         };
         phones: {
+            id: number;
+            userId: number;
             phone: string;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
-            userId: number;
         }[];
         cards: {
             number: string;
+            id: number;
+            userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             bankName: string;
             expired: string;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
-            userId: number;
         }[];
         comments: {
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             content: string;
         }[];
         videos: {
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             title: string | null;
             description: string | null;
             url: string;
@@ -215,10 +215,10 @@ export declare class UserController {
             fileSize: number | null;
         }[];
         images: {
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
             title: string | null;
             description: string | null;
             url: string;
@@ -227,111 +227,111 @@ export declare class UserController {
         partners: ({
             partner: {
                 telegramUser: {
-                    phone: string;
-                    username: string;
-                    createdAt: Date;
-                    updatedAt: Date;
                     id: number;
-                    userId: number | null;
                     telegramId: bigint;
+                    userId: number | null;
+                    phone: string;
                     firstName: string;
                     lastName: string;
                     fullname: string;
+                    username: string;
+                    createdAt: Date;
+                    updatedAt: Date;
                 };
                 phones: {
+                    id: number;
+                    userId: number;
                     phone: string;
                     createdAt: Date;
                     updatedAt: Date;
-                    id: number;
-                    userId: number;
                 }[];
                 cards: {
                     number: string;
-                    bankName: string;
-                    expired: string;
-                    createdAt: Date;
-                    updatedAt: Date;
                     id: number;
                     userId: number;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    bankName: string;
+                    expired: string;
                 }[];
             } & {
+                id: number;
                 phone: string;
+                username: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
                 image: string | null;
                 sudlangan: boolean;
-                name: string;
                 surname: string;
-                username: string;
                 birthdate: string;
                 pinfl: string;
                 gender: boolean;
-                createdAt: Date;
-                updatedAt: Date;
-                id: number;
             };
         } & {
-            createdAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
             partnerId: number;
         })[];
     } & {
+        id: number;
         phone: string;
+        username: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
         image: string | null;
         sudlangan: boolean;
-        name: string;
         surname: string;
-        username: string;
         birthdate: string;
         pinfl: string;
         gender: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
     }>;
     update(id: number, updateUserDto: UpdateUserDto, file?: Express.Multer.File): Promise<{
         phones: {
+            id: number;
+            userId: number;
             phone: string;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
-            userId: number;
         }[];
         cards: {
             number: string;
-            bankName: string;
-            expired: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
             userId: number;
+            createdAt: Date;
+            updatedAt: Date;
+            bankName: string;
+            expired: string;
         }[];
     } & {
+        id: number;
         phone: string;
+        username: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
         image: string | null;
         sudlangan: boolean;
-        name: string;
         surname: string;
-        username: string;
         birthdate: string;
         pinfl: string;
         gender: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
     }>;
     remove(id: number): Promise<{
+        id: number;
         phone: string;
+        username: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
         image: string | null;
         sudlangan: boolean;
-        name: string;
         surname: string;
-        username: string;
         birthdate: string;
         pinfl: string;
         gender: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
     }>;
     addPartners(userId: number, partnerIds: number[]): Promise<{
         id: number;
@@ -339,46 +339,46 @@ export declare class UserController {
         createdAt: Date;
         partner: {
             telegramUser: {
-                phone: string;
-                username: string;
-                createdAt: Date;
-                updatedAt: Date;
                 id: number;
-                userId: number | null;
                 telegramId: bigint;
+                userId: number | null;
+                phone: string;
                 firstName: string;
                 lastName: string;
                 fullname: string;
+                username: string;
+                createdAt: Date;
+                updatedAt: Date;
             };
             phones: {
+                id: number;
+                userId: number;
                 phone: string;
                 createdAt: Date;
                 updatedAt: Date;
-                id: number;
-                userId: number;
             }[];
             cards: {
                 number: string;
-                bankName: string;
-                expired: string;
-                createdAt: Date;
-                updatedAt: Date;
                 id: number;
                 userId: number;
+                createdAt: Date;
+                updatedAt: Date;
+                bankName: string;
+                expired: string;
             }[];
         } & {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     }[]>;
     getPartners(userId: number): Promise<{
@@ -387,46 +387,46 @@ export declare class UserController {
         createdAt: Date;
         partner: {
             telegramUser: {
-                phone: string;
-                username: string;
-                createdAt: Date;
-                updatedAt: Date;
                 id: number;
-                userId: number | null;
                 telegramId: bigint;
+                userId: number | null;
+                phone: string;
                 firstName: string;
                 lastName: string;
                 fullname: string;
+                username: string;
+                createdAt: Date;
+                updatedAt: Date;
             };
             phones: {
+                id: number;
+                userId: number;
                 phone: string;
                 createdAt: Date;
                 updatedAt: Date;
-                id: number;
-                userId: number;
             }[];
             cards: {
                 number: string;
-                bankName: string;
-                expired: string;
-                createdAt: Date;
-                updatedAt: Date;
                 id: number;
                 userId: number;
+                createdAt: Date;
+                updatedAt: Date;
+                bankName: string;
+                expired: string;
             }[];
         } & {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     }[]>;
     removePartner(userId: number, partnerId: number): Promise<{

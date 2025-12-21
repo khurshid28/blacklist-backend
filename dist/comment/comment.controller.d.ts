@@ -4,38 +4,38 @@ export declare class CommentController {
     private readonly commentService;
     constructor(commentService: CommentService);
     create(userId: string, createCommentDto: CreateCommentDto): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
     findAll(userId: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }[]>;
     findOne(id: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
     update(id: string, content: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
     remove(id: string): Promise<{
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
         content: string;
     }>;
 }

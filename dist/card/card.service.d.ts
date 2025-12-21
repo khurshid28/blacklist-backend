@@ -6,131 +6,131 @@ export declare class CardService {
     constructor(prisma: PrismaService);
     create(createCardDto: CreateCardDto): Promise<{
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
         number: string;
-        bankName: string;
-        expired: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
+        bankName: string;
+        expired: string;
     }>;
     findAll(): Promise<({
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
         number: string;
-        bankName: string;
-        expired: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
+        bankName: string;
+        expired: string;
     })[]>;
     findOne(id: number): Promise<{
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
         number: string;
-        bankName: string;
-        expired: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
+        bankName: string;
+        expired: string;
     }>;
     findByUserId(userId: number): Promise<({
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
         number: string;
-        bankName: string;
-        expired: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
+        bankName: string;
+        expired: string;
     })[]>;
     update(id: number, updateCardDto: UpdateCardDto): Promise<{
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
         number: string;
-        bankName: string;
-        expired: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
+        bankName: string;
+        expired: string;
     }>;
     remove(id: number): Promise<{
         number: string;
-        bankName: string;
-        expired: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
         userId: number;
+        createdAt: Date;
+        updatedAt: Date;
+        bankName: string;
+        expired: string;
     }>;
 }

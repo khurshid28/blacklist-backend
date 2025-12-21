@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const core_1 = require("@nestjs/core");
 const prisma_module_1 = require("./prisma/prisma.module");
 const user_module_1 = require("./user/user.module");
 const phone_module_1 = require("./phone/phone.module");
@@ -18,6 +19,11 @@ const comment_module_1 = require("./comment/comment.module");
 const video_module_1 = require("./video/video.module");
 const image_module_1 = require("./image/image.module");
 const upload_module_1 = require("./upload/upload.module");
+const auth_module_1 = require("./auth/auth.module");
+const client_module_1 = require("./client/client.module");
+const action_module_1 = require("./action/action.module");
+const jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
+const core_2 = require("@nestjs/core");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +34,9 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
             }),
             prisma_module_1.PrismaModule,
+            auth_module_1.AuthModule,
+            client_module_1.ClientModule,
+            action_module_1.ActionModule,
             upload_module_1.UploadModule,
             user_module_1.UserModule,
             phone_module_1.PhoneModule,
@@ -36,6 +45,13 @@ exports.AppModule = AppModule = __decorate([
             comment_module_1.CommentModule,
             video_module_1.VideoModule,
             image_module_1.ImageModule,
+        ],
+        providers: [
+            {
+                provide: core_1.APP_GUARD,
+                useFactory: (reflector) => new jwt_auth_guard_1.JwtAuthGuard(reflector),
+                inject: [core_2.Reflector],
+            },
         ],
     })
 ], AppModule);

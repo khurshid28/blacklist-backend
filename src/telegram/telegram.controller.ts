@@ -56,4 +56,13 @@ export class TelegramController {
       return { success: false, message: error.message };
     }
   }
+
+  @Get('all')
+  async getAllTelegramUsers(): Promise<TelegramUser[]> {
+    try {
+      return await this.telegramService.getAllTelegramUsers();
+    } catch (error: any) {
+      throw error;
+    }
+  }
 }

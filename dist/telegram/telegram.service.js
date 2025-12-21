@@ -71,15 +71,21 @@ let TelegramService = TelegramService_1 = class TelegramService {
                 this.client = null;
                 return;
             }
-            let session;
-            if (fs.existsSync(this.sessionPath)) {
-                session = new sessions_1.StringSession(fs.readFileSync(this.sessionPath, 'utf8'));
-            }
-            else {
+            if (!fs.existsSync(this.sessionPath)) {
                 this.logger.warn('⚠️  No telegram.session file found');
-                this.logger.warn('⚠️  Telegram features will be disabled until login');
-                session = new sessions_1.StringSession('');
+                this.logger.warn('⚠️  Telegram features will be disabled');
+                this.logger.warn('💡 Run telegram-login.js to create session');
+                this.client = null;
+                return;
             }
+            const sessionContent = fs.readFileSync(this.sessionPath, 'utf8').trim();
+            if (!sessionContent) {
+                this.logger.warn('⚠️  telegram.session file is empty');
+                this.logger.warn('⚠️  Telegram features will be disabled');
+                this.client = null;
+                return;
+            }
+            const session = new sessions_1.StringSession(sessionContent);
             const useProxy = process.env.TELEGRAM_USE_PROXY === 'true';
             const proxyConfig = useProxy ? {
                 socksType: 5,
@@ -101,6 +107,7 @@ let TelegramService = TelegramService_1 = class TelegramService {
                 maxConcurrentDownloads: 1,
                 ...(proxyConfig && { proxy: proxyConfig }),
             });
+            this.logger.log('✅ Telegram client initialized');
         }
         catch (error) {
             this.logger.error('❌ Failed to initialize Telegram client:', error.message);
@@ -348,18 +355,30 @@ let TelegramService = TelegramService_1 = class TelegramService {
                 ],
             }));
             console.log('findByPhone - API result:', result);
+            console.log('findByPhone - Imported contacts:', result.imported);
             if (result.users && result.users.length > 0) {
                 const user = result.users[0];
-                console.log('findByPhone - User found:', user);
+                console.log('findByPhone - Full user object:', JSON.stringify(user, null, 2));
                 if (user.accessHash) {
                     this.userAccessHashCache.set(user.id.toString(), user.accessHash.toString());
                     console.log(`✅ Cached accessHash for user ${user.id}`);
                 }
+                let firstName = user.firstName || '';
+                let lastName = user.lastName || '';
+                if (firstName === 'Search' && lastName === 'User') {
+                    console.log('⚠️  API returned our dummy names - user has privacy settings, NOT saving');
+                    return null;
+                }
+                if (!firstName.trim() && !lastName.trim() && !user.username) {
+                    console.log('⚠️  User has no name and no username - NOT saving');
+                    return null;
+                }
+                console.log(`📝 Extracted names - First: "${firstName}", Last: "${lastName}"`);
                 return {
                     telegram_id: user.id.toString(),
                     username: user.username || '',
-                    firstName: user.firstName || '',
-                    lastName: user.lastName || '',
+                    firstName: firstName,
+                    lastName: lastName,
                     phone: formattedPhone,
                 };
             }
@@ -481,6 +500,8 @@ let TelegramService = TelegramService_1 = class TelegramService {
             id: saved.id,
             telegramId: Number(saved.telegramId),
             phone: saved.phone,
+            firstName: saved.firstName,
+            lastName: saved.lastName,
             fullname: saved.fullname,
             username: saved.username,
             createdAt: saved.createdAt.toISOString(),

@@ -6,119 +6,119 @@ export declare class PhoneController {
     constructor(phoneService: PhoneService);
     create(createPhoneDto: CreatePhoneDto): Promise<{
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
+        id: number;
+        userId: number;
         phone: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
-        userId: number;
     }>;
     findAll(): Promise<({
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
+        id: number;
+        userId: number;
         phone: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
-        userId: number;
     })[]>;
     findByUserId(userId: number): Promise<({
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
+        id: number;
+        userId: number;
         phone: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
-        userId: number;
     })[]>;
     findOne(id: number): Promise<{
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
+        id: number;
+        userId: number;
         phone: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
-        userId: number;
     }>;
     update(id: number, updatePhoneDto: UpdatePhoneDto): Promise<{
         user: {
+            id: number;
             phone: string;
+            username: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
             image: string | null;
             sudlangan: boolean;
-            name: string;
             surname: string;
-            username: string;
             birthdate: string;
             pinfl: string;
             gender: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            id: number;
         };
     } & {
+        id: number;
+        userId: number;
         phone: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
-        userId: number;
     }>;
     remove(id: number): Promise<{
+        id: number;
+        userId: number;
         phone: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
-        userId: number;
     }>;
 }
